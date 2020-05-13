@@ -1,4 +1,4 @@
-name: uniquerandomgenerator
+name: unique_random_generator
 description: A library for creating unique random numbers efficiently without duplication
 version: 0.0.1
 author:
