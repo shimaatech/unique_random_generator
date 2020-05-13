@@ -54,12 +54,9 @@ class SplittableExclusiveRange {
   final int min;
   final int max;
 
-  List<ExclusiveRange> _subRanges;
+  final List<ExclusiveRange> _subRanges;
 
-  SplittableExclusiveRange(this.min, this.max) {
-    assert(min < max);
-    _subRanges = [ExclusiveRange(min, max)];
-  }
+  SplittableExclusiveRange(this.min, this.max): assert(min < max), _subRanges = [ExclusiveRange(min, max)];
 
   void split(int x) {
     for (ExclusiveRange range in _subRanges) {
@@ -74,6 +71,11 @@ class SplittableExclusiveRange {
   }
 
   List<ExclusiveRange> get subRanges => List.unmodifiable(_subRanges);
+
+  void reset() {
+    _subRanges.clear();
+    _subRanges.add(ExclusiveRange(min, max));
+  }
 }
 
 /// A random generator with unique value each time...
@@ -84,12 +86,15 @@ class UniqueRandomGenerator {
   /// exclusive max value
   final int max;
 
+  final bool autoReset;
+
   final Random _random = Random();
   final SplittableExclusiveRange _range;
 
   UniqueRandomGenerator({
     this.min = 1,
     @required this.max,
+    this.autoReset = false,
   }) : _range = SplittableExclusiveRange(min - 1, max);
 
   /// Get next random number which is different than all random numbers
@@ -98,7 +103,11 @@ class UniqueRandomGenerator {
     List<ExclusiveRange> subRanges = _range.subRanges;
     if (subRanges == null || subRanges.isEmpty) {
       // All possible random numbers were already generated
-      throw NoMoreRandomNumberException(min, max);
+      if (!autoReset) {
+        throw NoMoreRandomNumberException(min, max);
+      }
+      _range.reset();
+      subRanges = _range.subRanges;
     }
 
     // choose a random range...
@@ -112,4 +121,5 @@ class UniqueRandomGenerator {
 
     return result;
   }
+
 }
