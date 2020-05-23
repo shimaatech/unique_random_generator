@@ -106,7 +106,8 @@ class UniqueRandomGenerator {
       if (!autoReset) {
         throw NoMoreRandomNumberException(min, max);
       }
-      _range.reset();
+      reset();
+      // update the local subRanges after reset...
       subRanges = _range.subRanges;
     }
 
@@ -121,5 +122,7 @@ class UniqueRandomGenerator {
 
     return result;
   }
+
+  void reset() => _range.reset();
 
 }
